@@ -1,5 +1,36 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Events</title>
+    <!-- Dodaj linki do arkuszy stylów, skryptów JavaScript itp. -->
+</head>
+<style>
+    .big-button {
+        display: block;
+        width: 200px; /* dostosuj szerokość przycisku według potrzeb */
+        height: 100px; /* dostosuj wysokość przycisku według potrzeb */
+        margin: 0 auto;
+        background-color: #d63384;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+        .big-button:hover {
+            background-color: #d63384;
+        }
+</style>
+<body>
+    <div class="header">
+        <h1>Events</h1>
+    </div>
+    <div class="container">
+        <!-- Dodaj przycisk na środku strony -->
+        <button class="big-button" onclick="addNewEvent()">Dodaj nowe wydarzenie</button>
+    </div>
+    <!-- Dodaj pozostałą część widoku -->
+</body>
+</html>
+

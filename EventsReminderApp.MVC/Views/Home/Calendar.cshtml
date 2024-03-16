@@ -1,5 +1,166 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    // Ustawienie daty początkowej na pierwszy dzień aktualnego miesiąca
+    DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+    // Pobranie aktualnej daty
+    DateTime currentDate = DateTime.Now;
+
+    // Pobranie pierwszego dnia tygodnia dla danego miesiąca
+    DayOfWeek firstDayOfWeek = firstDayOfMonth.DayOfWeek;
+
+    // Pobranie liczby dni w miesiącu
+    int numberOfDaysInMonth = DateTime.DaysInMonth(firstDayOfMonth.Year, firstDayOfMonth.Month);
+
+    // Obliczenie liczby wierszy potrzebnych do wyświetlenia wszystkich dni
+    int numRows = (int)Math.Ceiling((double)(numberOfDaysInMonth + (int)firstDayOfWeek) / 7);
+
+    // Utworzenie tablicy dni miesiąca
+    List<DateTime> daysOfMonth = new List<DateTime>();
+
+    // Dodanie dni miesiąca do tablicy, uwzględniając pierwszy dzień tygodnia
+    for (int i = 0; i < numRows * 7; i++)
+    {
+        int dayOffset = i - (int)firstDayOfWeek + 1;
+        DateTime date = firstDayOfMonth.AddDays(dayOffset);
+        if (dayOffset >= 0 && dayOffset < numberOfDaysInMonth)
+        {
+            daysOfMonth.Add(date);
+        }
+        else
+        {
+            daysOfMonth.Add(DateTime.MinValue); // Dodaj pustą datę, aby zachować stałą liczbę kolumn
+        }
+    }
 }
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kalendarz</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            width: 70%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .current-day {
+            background-color: #007bff;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-right: 20px;
+            border: none;
+            font-size: 18px;
+        }
+
+            .button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+    <script>
+        function goToPreviousMonth() {
+            var currentMonth = @(firstDayOfMonth.Month);
+            var currentYear = @(firstDayOfMonth.Year);
+            var url = "/Calendar?year=" + currentYear + "&month=" + (currentMonth - 1);
+            window.location.href = url;
+        }
+
+        function goToNextMonth() {
+            var currentMonth = @(firstDayOfMonth.Month);
+            var currentYear = @(firstDayOfMonth.Year);
+            var url = "/Calendar?year=" + currentYear + "&month=" + (currentMonth + 1);
+            window.location.href = url;
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>Kalendarz</h1>
+    </div>
+    <div class="container">
+        <h2>@firstDayOfMonth.ToString("MMMM yyyy")</h2>
+        <table>
+            <tr>
+                <th>Pon</th>
+                <th>Wt</th>
+                <th>Śr</th>
+                <th>Czw</th>
+                <th>Pt</th>
+                <th>Sob</th>
+                <th>Niedz</th>
+            </tr>
+            @for (int i = 0; i < numRows; i++)
+            {
+                <tr>
+                    @for (int j = 0; j < 7; j++)
+                    {
+                        int index = i * 7 + j;
+                        DateTime day = daysOfMonth[index];
+                        if (day != DateTime.MinValue)
+                        {
+                            bool isCurrentDay = (day.Date == DateTime.Now.Date);
+                            string cellClass = isCurrentDay ? "current-day" : "";
+                            <td class="@cellClass">@day.Day</td>
+                        }
+                        else
+                        {
+                            // Sprawdź, czy to jest ostatni tydzień i czy wszystkie kolejne dni są puste
+                            bool isLastWeek = (i == numRows - 1);
+                            bool isAllCellsEmpty = daysOfMonth.GetRange(index, 7 - j).All(d => d == DateTime.MinValue);
+                            if (!isLastWeek || !isAllCellsEmpty)
+                            {
+                                <td></td>
+                            }
+                        }
+                    }
+                </tr>
+
+            }
+        </table>
+
+        <div class="button-container">
+            <button class="button" onclick="goToPreviousMonth()">Poprzedni miesiąc</button>
+            <button class="button" onclick="goToNextMonth()">Następny miesiąc</button>
+        </div>
+    </div>
+</body>
+</html>
+

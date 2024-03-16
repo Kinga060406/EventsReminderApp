@@ -24,11 +24,6 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Birthday()
-    {
-        return View();
-    }
-
     public IActionResult Calendar()
     {
         return View();
