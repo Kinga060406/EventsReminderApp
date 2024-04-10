@@ -1,0 +1,38 @@
+﻿@model EventsReminderApp.MVC.Models.Events
+
+@{
+    // Obliczenie daty maksymalnej
+    DateTime maxDate = DateTime.Now.AddYears(50);
+    string maxDateString = maxDate.ToString("yyyy-MM-dd");
+}
+
+@using (Html.BeginForm("AddEvent", "Events", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name)
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Description)
+        @Html.TextBoxFor(model => model.Description, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Date)
+        @Html.TextBoxFor(model => model.Date, new { @class = "form-control", type = "date", min = DateTime.Now.ToString("yyyy-MM-dd"), max = maxDateString })
+        @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Time)
+        @Html.TextBoxFor(model => model.Time, new { @class = "form-control", type = "time" })
+        @Html.ValidationMessageFor(model => model.Time, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+}

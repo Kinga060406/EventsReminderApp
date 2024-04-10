@@ -1,0 +1,71 @@
+﻿@model IEnumerable<EventsReminderApp.MVC.Models.Events>
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Styl dla nagłówków i komórek w tabeli */
+        table.table thead th,
+        table.table tbody td {
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Events</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Time)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Time)
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Event Actions">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
