@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace EventsReminderApp.MVC.Models
 {
-    public class EventsReminderAppContext : IdentityDbContext
+    public class EventsReminderAppContext : IdentityDbContext<UserModel>
     {
         public DbSet<Events> Events { get; set; }
 

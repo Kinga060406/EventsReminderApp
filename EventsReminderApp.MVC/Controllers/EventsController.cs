@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using EventsReminderApp;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
-
+[Authorize]
 public class EventsController : Controller
 {
-
+   
     private readonly EventsReminderAppContext _context;
 
     public EventsController(EventsReminderAppContext context)

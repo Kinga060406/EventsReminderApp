@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using EventsReminderApp;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventsReminderApp.MVC.Controllers
 {
+        [Authorize]
         public class CalendarController : Controller
         {
             public ActionResult Calendar()
