@@ -1,4 +1,5 @@
 ﻿@model EventsReminderApp.MVC.Models.Events
+@using EventsReminderApp.MVC.Models
 
 @{
     // Obliczenie daty maksymalnej
@@ -34,5 +35,5 @@
         @Html.ValidationMessageFor(model => model.Time, "", new { @class = "text-danger" })
     </div>
 
-    <button type="submit" class="btn btn-primary">Dodaj</button>
+    <button type="submit" class="btn btn-primary">Add</button>
 }

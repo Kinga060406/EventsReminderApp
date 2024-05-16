@@ -1,11 +1,16 @@
 using EventsReminderApp.MVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<EventsValidator>());
+
 
 builder.Services.AddDbContext<EventsReminderAppContext>(options => options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=EventsDb;Trusted_Connection=True;"));
 
