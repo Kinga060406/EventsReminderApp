@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace EventsReminderApp.MVC.Controllers
 {
@@ -21,9 +20,11 @@ namespace EventsReminderApp.MVC.Controllers
         public IActionResult GetReminders()
         {
             var now = DateTime.Now;
+            var tenMinutesFromNow = now.AddMinutes(10);
+
             var upcomingEvents = _context.Events
                 .AsEnumerable()
-                .Where(e => e.Date.ToDateTime(e.Time) > now)
+                .Where(e => e.Date.ToDateTime(e.Time) > now && e.Date.ToDateTime(e.Time) <= tenMinutesFromNow)
                 .Select(e => new {
                     e.Name,
                     e.Description,
@@ -31,7 +32,7 @@ namespace EventsReminderApp.MVC.Controllers
                 })
                 .ToList();
 
-            Console.WriteLine($"Liczba nadchodzących wydarzeń: {upcomingEvents.Count}");
+            Console.WriteLine($"Liczba nadchodzących wydarzeń w ciągu 10 minut: {upcomingEvents.Count}");
 
             return Json(upcomingEvents);
         }
