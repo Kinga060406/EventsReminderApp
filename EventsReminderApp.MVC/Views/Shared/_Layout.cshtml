@@ -31,7 +31,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Events" asp-action="Events">Events</a>
                         </li>
-                        @if(User.Identity.IsAuthenticated)
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="LogOut">Log out</a>
@@ -59,12 +59,59 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - EventsReminderApp 
+            &copy; 2024 - EventsReminderApp
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            // Poproś o zgodę na powiadomienia
+            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === 'granted') {
+                        // Zgoda została udzielona
+                    } else {
+                        console.error("Użytkownik nie udzielił zgody na powiadomienia.");
+                    }
+                });
+            }
+
+            function showNotification(title, body) {
+                if (Notification.permission === 'granted') {
+                    var options = {
+                        body: body,
+                        // icon: '/path/to/icon.png' // upewnij się, że ścieżka jest poprawna lub usuń tę linię
+                    };
+                    new Notification(title, options);
+                } else {
+                    console.error("Brak uprawnień do wyświetlania powiadomień.");
+                }
+            }
+
+            function fetchReminders() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Notifications/GetReminders', // Zaktualizowano URL do nowego kontrolera
+                    contentType: 'application/json',
+                    success: function (response) {
+                        response.forEach(function (reminder) {
+                            var date = new Date(reminder.date);
+                            var dateString = date.toLocaleString();
+                            showNotification(reminder.name, reminder.description + ' at ' + dateString);
+                        });
+                    },
+                    error: function (error) {
+                        console.error('Wystąpił błąd podczas pobierania przypomnień:', error);
+                    }
+                });
+            }
+
+            setInterval(fetchReminders, 300000); // Co 5 minut (300000 ms)
+            fetchReminders(); // Natychmiast po załadowaniu strony
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

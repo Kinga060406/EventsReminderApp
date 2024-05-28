@@ -11,8 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews()
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<EventsValidator>());
 
-
-builder.Services.AddDbContext<EventsReminderAppContext>(options => options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=EventsDb;Trusted_Connection=True;"));
+builder.Services.AddDbContext<EventsReminderAppContext>(options =>
+    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=EventsDb;Trusted_Connection=True;"));
 
 builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
 {
@@ -21,8 +21,8 @@ builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
-
-}).AddEntityFrameworkStores<EventsReminderAppContext>();
+})
+.AddEntityFrameworkStores<EventsReminderAppContext>();
 
 var app = builder.Build();
 
@@ -30,11 +30,8 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -42,7 +39,6 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
