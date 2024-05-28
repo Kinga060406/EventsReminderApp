@@ -1,128 +1,159 @@
 ﻿using EventsReminderApp.MVC.Models;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using EventsReminderApp;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-
-public class EventsController : Controller
+namespace EventsReminderApp.MVC.Controllers
 {
-
-    private readonly EventsReminderAppContext _context;
-
-    public EventsController(EventsReminderAppContext context)
+    [Authorize]
+    public class EventsController : Controller
     {
-        _context = context;
-    }
+        private readonly EventsReminderAppContext _context;
 
-    public IActionResult AddEvent()
-    {
-        return View();
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Events()
-    {
-        List<Events> events = await _context.Events.ToListAsync();
-        return View(events);
-    }
-
-    [HttpGet]
-    public IActionResult AddEventForm()
-    {
-        return PartialView("_AddEventForm");
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddEvent(Events events)
-    {
-        if (ModelState.IsValid)
+        public EventsController(EventsReminderAppContext context)
         {
-            try
-            {
-                _context.Events.Add(events);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Events", "Events");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"An error occurred while saving the event: {ex.Message}");
-            }
-        }
-        return View("Error");
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
+            _context = context;
         }
 
-        var events = await _context.Events.FindAsync(id);
-
-        if (events == null)
+        public IActionResult AddEvent()
         {
-            return NotFound();
+            return View();
         }
 
-        return View(events);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, Events events)
-    {
-        if (id != events.Id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddEvent(Events events)
         {
-            return NotFound();
-        }
+            // Walidacja modelu za pomocą FluentValidation
+            EventsValidator validator = new EventsValidator();
+            ValidationResult results = validator.Validate(events);
 
-        if (ModelState.IsValid)
-        {
-            try
+            if (results.IsValid)
             {
-                _context.Update(events);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Events));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EventExists(events.Id))
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    try
+                    {
+                        _context.Events.Add(events);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("Events", "Events");
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", $"An error occurred while saving the event: {ex.Message}");
+                    }
                 }
             }
+            else
+            {
+                foreach (var error in results.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+            }
+
+            // Jeśli walidacja nie powiedzie się, lub istnieją błędy w ModelState, zwróć widok z błędami
+            return View(events);
         }
-        return View(events);
-    }
 
-    private bool EventExists(int id)
-    {
-        return _context.Events.Any(e => e.Id == id);
-    }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var events = await _context.Events.FindAsync(id);
-        if (events == null)
+        [HttpGet]
+        public async Task<IActionResult> Events()
         {
-            return NotFound();
+            List<Events> events = await _context.Events.ToListAsync();
+            return View(events);
         }
 
-        _context.Events.Remove(events);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Events));
+        [HttpGet]
+        public IActionResult AddEventForm()
+        {
+            return PartialView("_AddEventForm");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var events = await _context.Events.FindAsync(id);
+
+            if (events == null)
+            {
+                return NotFound();
+            }
+
+            return View(events);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Events events)
+        {
+            if (id != events.Id)
+            {
+                return NotFound();
+            }
+
+            EventsValidator validator = new EventsValidator();
+            ValidationResult results = validator.Validate(events);
+
+            if (ModelState.IsValid && results.IsValid)
+            {
+                try
+                {
+                    _context.Update(events);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Events));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!EventExists(events.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var error in results.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+            }
+
+            return View(events);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var events = await _context.Events.FindAsync(id);
+            if (events == null)
+            {
+                return NotFound();
+            }
+
+            _context.Events.Remove(events);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Events));
+        }
+
+        private bool EventExists(int id)
+        {
+            return _context.Events.Any(e => e.Id == id);
+        }
     }
-
-
 }

@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Kalendarz</title>
+    <title>Calendar</title>
     <style>
         body {
             margin: 0;
@@ -66,19 +66,20 @@
 </head>
 <body>
     <div class="header">
-        <h1>Kalendarz</h1>
+        <h1>Calender</h1>
     </div>
     <div class="container">
-        <h2>@calendar.FirstDayOfMonth.ToString("MMMM yyyy")</h2>
+        <h2>@calendar.FirstDayOfMonth.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</h2>
+
         <table>
             <tr>
-                <th>Pon</th>
-                <th>Wt</th>
-                <th>Śr</th>
-                <th>Czw</th>
-                <th>Pt</th>
-                <th>Sob</th>
-                <th>Niedz</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
             </tr>
             @for (int i = 0; i < calendar.NumRows; i++)
             {
@@ -109,8 +110,8 @@
         </table>
 
         <div class="button-container">
-            <button class="button" onclick="goToPreviousMonth()">Poprzedni miesiąc</button>
-            <button class="button" onclick="goToNextMonth()">Następny miesiąc</button>
+            <button class="button" onclick="goToPreviousMonth()">Previous month</button>
+            <button class="button" onclick="goToNextMonth()">Next month</button>
         </div>
     </div>
 

@@ -1,0 +1,13 @@
+﻿@model EventsReminderApp.MVC.Models.Register;
+
+<h2>Register</h2>
+
+@using(Html.BeginForm("Register", "Account", FormMethod.Post))
+{
+    @Html.ValidationSummary();
+    <span>Login: </span> @Html.TextBoxFor(x => x.UserName)
+    <span>Email: </span> @Html.TextBoxFor(x => x.Email)
+    <span>Password: </span> @Html.PasswordFor(x => x.Password)
+
+    <button type="submit">Register</button>
+}
