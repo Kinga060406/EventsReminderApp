@@ -45,7 +45,7 @@ namespace EventsReminderApp.MVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("EventsReminderApp.MVC.Models.UserModel", b =>

@@ -1,8 +1,10 @@
-﻿@{
+﻿@model EventsReminderApp.MVC.Models.UserModel
+
+@{
     ViewData["Title"] = "Profil";
 }
 
-<h2>Twój Profil</h2>
+<h2>Twój Profil: @Model.UserName</h2>
 
 <h2>Edytuj Nazwę Użytkownika</h2>
 <form asp-action="EditUsername" method="post">
@@ -27,5 +29,5 @@
 </form>
 
 <form asp-action="DeleteAccount" asp-controller="Account" method="post">
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć swoje konto?');">Usuń kontoo</button>
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć swoje konto?');">Usuń konto</button>
 </form>

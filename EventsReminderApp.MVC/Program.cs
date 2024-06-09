@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews()
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<EventsValidator>());
 
 builder.Services.AddDbContext<EventsReminderAppContext>(options =>
-    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=EventsDb;Trusted_Connection=True;"));
+    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=EventsDatabase;Trusted_Connection=True;"));
 
 builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
 {
