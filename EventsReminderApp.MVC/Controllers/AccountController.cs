@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Mvc;
 using EventsReminderApp.MVC.Models;
+using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace EventsReminderApp.MVC.Controllers
 {
@@ -125,9 +125,15 @@ namespace EventsReminderApp.MVC.Controllers
         }
 
         [HttpGet]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            return View(user);
         }
     }
 }
