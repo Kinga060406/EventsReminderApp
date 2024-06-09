@@ -61,7 +61,6 @@ namespace EventsReminderApp.MVC.Controllers
             return View(events);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Events()
         {

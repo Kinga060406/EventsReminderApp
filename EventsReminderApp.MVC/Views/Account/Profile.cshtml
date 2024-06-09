@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Profil";
+}
+
+<h2>Twój Profil</h2>
+
+<h2>Edytuj Nazwę Użytkownika</h2>
+<form asp-action="EditUsername" method="post">
+    <div class="form-group">
+        <label for="newUsername">Nowa Nazwa Użytkownika:</label>
+        <input type="text" class="form-control" id="newUsername" name="newUsername" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>
+
+<h2>Edytuj Hasło</h2>
+<form asp-action="EditPassword" method="post">
+    <div class="form-group">
+        <label for="currentPassword">Obecne Hasło:</label>
+        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required />
+    </div>
+    <div class="form-group">
+        <label for="newPassword">Nowe Hasło:</label>
+        <input type="password" class="form-control" id="newPassword" name="newPassword" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>
+
+<form asp-action="DeleteAccount" asp-controller="Account" method="post">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć swoje konto?');">Usuń konto</button>
+</form>
