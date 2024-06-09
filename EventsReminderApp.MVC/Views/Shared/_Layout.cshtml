@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - EventsReminderApp.MVC</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EventsReminderApp.MVC.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 </head>
 <body>
     <header>
@@ -62,53 +62,69 @@
             &copy; 2024 - EventsReminderApp
         </div>
     </footer>
+
+    <!-- Kontener audio -->
+    <audio id="notification-sound" src="~/sounds/notification.mp3" preload="auto"></audio>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
-            // Poproś o zgodę na powiadomienia
-            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-                Notification.requestPermission().then(function (permission) {
-                    if (permission === 'granted') {
-                        // Zgoda została udzielona
-                    } else {
-                        console.error("Użytkownik nie udzielił zgody na powiadomienia.");
-                    }
-                });
-            }
+            console.log("Document ready");
 
-            function showNotification(title, body) {
-                if (Notification.permission === 'granted') {
-                    var options = {
-                        body: body,
-                        // icon: '/path/to/icon.png' // upewnij się, że ścieżka jest poprawna lub usuń tę linię
-                    };
-                    new Notification(title, options);
-                } else {
-                    console.error("Brak uprawnień do wyświetlania powiadomień.");
-                }
+            function showToast(title, body) {
+                // Odtwarzanie dźwięku
+                var audio = document.getElementById('notification-sound');
+                audio.play();
+
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "0",  // Toast nie zamknie się automatycznie
+                    "extendedTimeOut": "0",  // Toast nie zamknie się automatycznie
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+
+                toastr.success(body, title);
             }
 
             function fetchReminders() {
+                console.log("Fetching reminders");
                 $.ajax({
                     type: 'GET',
-                    url: '/Notifications/GetReminders', // Zaktualizowano URL do nowego kontrolera
+                    url: '/Notifications/GetReminders',
                     contentType: 'application/json',
                     success: function (response) {
+                        console.log("Reminders fetched successfully: ", response);
+                        if (response.length === 0) {
+                            console.log("No reminders found.");
+                        }
                         response.forEach(function (reminder) {
+                            console.log("Processing reminder: ", reminder);
                             var date = new Date(reminder.date);
                             var dateString = date.toLocaleString();
-                            showNotification(reminder.name, reminder.description + ' at ' + dateString);
+                            showToast(reminder.name, reminder.description + ' at ' + dateString);
                         });
                     },
                     error: function (error) {
-                        console.error('Wystąpił błąd podczas pobierania przypomnień:', error);
+                        console.error('Error fetching reminders:', error);
                     }
                 });
             }
 
-            setInterval(fetchReminders, 300000); // Co 5 minut (300000 ms)
+            setInterval(fetchReminders, 60000); // Co 1 minutę (60000 ms)
             fetchReminders(); // Natychmiast po załadowaniu strony
         });
     </script>
