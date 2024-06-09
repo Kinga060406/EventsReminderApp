@@ -22,8 +22,11 @@ namespace EventsReminderApp.MVC.Controllers
             var now = DateTime.Now;
             var tenMinutesFromNow = now.AddMinutes(10);
 
-            var upcomingEvents = _context.Events
-                .AsEnumerable()
+            // Pobierz wszystkie wydarzenia z bazy danych
+            var allEvents = _context.Events.ToList();
+
+            // Przefiltruj wydarzenia w pamięci
+            var upcomingEvents = allEvents
                 .Where(e => e.Date.ToDateTime(e.Time) > now && e.Date.ToDateTime(e.Time) <= tenMinutesFromNow)
                 .Select(e => new {
                     e.Name,
@@ -38,3 +41,4 @@ namespace EventsReminderApp.MVC.Controllers
         }
     }
 }
+
