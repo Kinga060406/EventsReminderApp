@@ -31,11 +31,19 @@ namespace EventsReminderApp.MVC.Controllers
                 return View(userLoginData);
             }
 
-            await _signInManager.PasswordSignInAsync(userLoginData.UserName, userLoginData.Password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(userLoginData.UserName, userLoginData.Password, false, false);
 
-            //przekierowanie do innego kontrolera
-            return RedirectToAction("Events", "Events");
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Events", "Events");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your username and password.");
+                return View(userLoginData);
+            }
         }
+
 
         [HttpGet]
         public IActionResult Register()

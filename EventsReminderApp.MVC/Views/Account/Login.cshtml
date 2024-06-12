@@ -1,13 +1,41 @@
-﻿@model EventsReminderApp.MVC.Models.Login;
+﻿@model EventsReminderApp.MVC.Models.Login
 
-<h2>Log in</h2>
+@{
+    ViewData["Title"] = "Login";
+}
 
-@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Login">
+    <div class="form-group">
+        <label asp-for="UserName" class="control-label"></label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Login" class="btn btn-primary" />
+    </div>
+</form>
+
+@if (ViewData.ModelState.ErrorCount > 0)
 {
-    @Html.ValidationSummary()
-    ;
-    <span>Login: </span> @Html.TextBoxFor(x => x.UserName)
-    <span>Password: </span> @Html.PasswordFor(x => x.Password)
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
 
-    <button type="submit">Log in</button>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
