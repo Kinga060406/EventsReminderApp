@@ -6,7 +6,7 @@
     var year = Model.CurrentDate.Year;
     var month = Model.CurrentDate.Month;
     var currentDay = DateTime.Now;
-    var monthName = Model.CurrentDate.ToString("MMMM yyyy");
+    var monthName = Model.CurrentDate.ToString("MMMM yyyy", new System.Globalization.CultureInfo("en-US"));
 }
 
 <!DOCTYPE html>
@@ -46,7 +46,18 @@
             padding: 2px 5px;
             margin: 2px 0;
             border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
+            .event .icon {
+                cursor: pointer;
+                color: white;
+                border: none;
+                background: none;
+                padding: 0;
+            }
     </style>
 </head>
 <body>
@@ -87,6 +98,16 @@
                                         {
                                             <div class="event">
                                                 @eventItem.Name
+                                                <div>
+                                                    <a asp-action="Edit" asp-route-id="@eventItem.Id" class="icon" title="Edit">
+                                                        <i class="fa fa-pencil-alt"></i>
+                                                    </a>
+                                                    <form asp-action="Delete" asp-route-id="@eventItem.Id" method="post" style="display:inline;">
+                                                        <button type="submit" class="icon" title="Delete">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         }
                                     }
@@ -106,5 +127,8 @@
         <a asp-action="PreviousMonth" asp-route-year="@year" asp-route-month="@month" class="btn btn-primary">Previous Month</a>
         <a asp-action="NextMonth" asp-route-year="@year" asp-route-month="@month" class="btn btn-primary">Next Month</a>
     </div>
+
+    <!-- Add FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </body>
 </html>
