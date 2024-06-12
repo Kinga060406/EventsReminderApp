@@ -119,10 +119,23 @@ namespace EventsReminderApp.MVC.Controllers
                     await _signInManager.RefreshSignInAsync(user);
                     return RedirectToAction("Profile");
                 }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    ModelState.AddModelError(string.Empty, "Current password is incorrect.");
+                }
             }
-            // Handle errors appropriately
-            return View("Error");
+            else
+            {
+                ModelState.AddModelError(string.Empty, "User not found.");
+            }
+
+            return View("Profile", user);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Profile()
