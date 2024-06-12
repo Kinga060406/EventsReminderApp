@@ -1,120 +1,110 @@
-﻿@{
-    Calendar calendar = new Calendar(DateTime.Now);
+﻿@model Calendar
+
+@{
+    ViewData["Title"] = "Calendar";
+    var events = ViewBag.Events as List<EventsReminderApp.MVC.Models.Events>;
+    var year = Model.CurrentDate.Year;
+    var month = Model.CurrentDate.Month;
+    var currentDay = DateTime.Now;
+    var monthName = Model.CurrentDate.ToString("MMMM yyyy");
 }
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Calendar</title>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .header {
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-        }
-
-        table {
+        .calendar {
+            display: table;
+            width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            width: 70%;
-            max-width: 800px;
-            margin: 0 auto;
         }
 
-        th, td {
-            border: 1px solid black;
-            padding: 20px;
-            text-align: center;
-            font-size: 20px;
-        }
+            .calendar th, .calendar td {
+                border: 1px solid #ccc;
+                padding: 10px;
+                text-align: center;
+                vertical-align: top;
+                width: 14.28%; /* 100% / 7 dni tygodnia */
+            }
+
+            .calendar .header {
+                background-color: #f5f5f5;
+                font-weight: bold;
+            }
 
         .current-day {
-            background-color: #007bff;
-        }
-
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .button {
-            display: inline-block;
-            background-color: #007bff;
+            background-color: #0000ff; /* Niebieski kolor */
             color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-right: 20px;
-            border: none;
-            font-size: 18px;
         }
 
-            .button:hover {
-                background-color: #0056b3;
-            }
+        .event {
+            background-color: #ff0000; /* Czerwony kolor */
+            color: white;
+            padding: 2px 5px;
+            margin: 2px 0;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Calender</h1>
-    </div>
-    <div class="container">
-        <h2>@calendar.FirstDayOfMonth.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</h2>
-
-        <table>
+    <h1>@ViewData["Title"]</h1>
+    <h2>@monthName</h2>
+    <table class="calendar">
+        <thead>
             <tr>
+                <th>Sunday</th>
                 <th>Monday</th>
                 <th>Tuesday</th>
                 <th>Wednesday</th>
                 <th>Thursday</th>
                 <th>Friday</th>
                 <th>Saturday</th>
-                <th>Sunday</th>
             </tr>
-            @for (int i = 0; i < calendar.NumRows; i++)
-            {
-                <tr>
-                    @for (int j = 0; j < 7; j++)
-                    {
-                        int index = i * 7 + j;
-                        DateTime day = calendar.DaysOfMonth[index];
-                        if (day != DateTime.MinValue)
+        </thead>
+        <tbody>
+            @{
+                var days = Model.DaysOfMonth;
+                int daysInWeek = 7;
+                int totalDays = days.Count;
+                for (int i = 0; i < totalDays; i += daysInWeek)
+                {
+                    <tr>
+                        @for (int j = 0; j < daysInWeek; j++)
                         {
-                            bool isCurrentDay = (day.Date == DateTime.Now.Date);
-                            string cellClass = isCurrentDay ? "current-day" : "";
-                            <td class="@cellClass">@day.Day</td>
-                        }
-                        else
-                        {
-                            // Sprawdź, czy to jest ostatni tydzień i czy wszystkie kolejne dni są puste
-                            bool isLastWeek = (i == calendar.NumRows - 1);
-                            bool isAllCellsEmpty = calendar.DaysOfMonth.GetRange(index, 7 - j).All(d => d == DateTime.MinValue);
-                            if (!isLastWeek || !isAllCellsEmpty)
+                            var index = i + j;
+                            if (index < totalDays)
+                            {
+                                var day = days[index];
+                                var dayClass = (day.Date == currentDay.Date) ? "current-day" : "";
+                                <td class="@dayClass">
+                                    @if (day != DateTime.MinValue)
+                                    {
+                                        <div class="day-header">@day.Day</div>
+                                        @foreach (var eventItem in events.Where(e => e.Date.ToDateTime(TimeOnly.MinValue).Date == day.Date))
+                                        {
+                                            <div class="event">
+                                                @eventItem.Name
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                            }
+                            else
                             {
                                 <td></td>
                             }
                         }
-                    }
-                </tr>
+                    </tr>
+                }
             }
-        </table>
-
-        <div class="button-container">
-            <button class="button" onclick="goToPreviousMonth()">Previous month</button>
-            <button class="button" onclick="goToNextMonth()">Next month</button>
-        </div>
+        </tbody>
+    </table>
+    <div>
+        <a asp-action="PreviousMonth" asp-route-year="@year" asp-route-month="@month" class="btn btn-primary">Previous Month</a>
+        <a asp-action="NextMonth" asp-route-year="@year" asp-route-month="@month" class="btn btn-primary">Next Month</a>
     </div>
-
-    <!-- Scripts -->
 </body>
 </html>

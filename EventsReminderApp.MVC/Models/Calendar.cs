@@ -1,35 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
-public class Calendar
+namespace EventsReminderApp.MVC.Models
 {
-    public DateTime FirstDayOfMonth { get; }
-    public List<DateTime> DaysOfMonth { get; }
-    public int NumRows { get; }
-
-    public Calendar(DateTime currentDate)
+    public class Calendar
     {
-        FirstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+        public DateTime CurrentDate { get; private set; }
+        public List<DateTime> DaysOfMonth { get; private set; }
 
-        DayOfWeek firstDayOfWeek = FirstDayOfMonth.DayOfWeek;
-        int numberOfDaysInMonth = DateTime.DaysInMonth(FirstDayOfMonth.Year, FirstDayOfMonth.Month);
-
-        NumRows = (int)Math.Ceiling((double)(numberOfDaysInMonth + (int)firstDayOfWeek) / 7);
-
-        DaysOfMonth = new List<DateTime>();
-
-        for (int i = 0; i < NumRows * 7; i++)
+        public Calendar(DateTime currentDate)
         {
-            int dayOffset = i - (int)firstDayOfWeek + 1;
-            DateTime date = FirstDayOfMonth.AddDays(dayOffset);
-            if (dayOffset >= 0 && dayOffset < numberOfDaysInMonth)
+            CurrentDate = currentDate;
+            DaysOfMonth = GenerateDaysOfMonth(currentDate);
+        }
+
+        private List<DateTime> GenerateDaysOfMonth(DateTime currentDate)
+        {
+            var days = new List<DateTime>();
+            var firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+            // Add leading days from previous month
+            var leadingDays = (int)firstDayOfMonth.DayOfWeek;
+            for (int i = 0; i < leadingDays; i++)
             {
-                DaysOfMonth.Add(date);
+                days.Add(DateTime.MinValue); // Placeholder for empty days
             }
-            else
+
+            // Add days of the current month
+            for (var day = firstDayOfMonth; day <= lastDayOfMonth; day = day.AddDays(1))
             {
-                DaysOfMonth.Add(DateTime.MinValue);
+                days.Add(day);
             }
+
+            // Add trailing days to fill the last week
+            var trailingDays = 7 - days.Count % 7;
+            if (trailingDays < 7)
+            {
+                for (int i = 0; i < trailingDays; i++)
+                {
+                    days.Add(DateTime.MinValue); // Placeholder for empty days
+                }
+            }
+
+            return days;
         }
     }
 }
