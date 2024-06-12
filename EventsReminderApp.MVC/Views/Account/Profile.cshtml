@@ -1,33 +1,71 @@
 ﻿@model EventsReminderApp.MVC.Models.UserModel
 
 @{
-    ViewData["Title"] = "Profil";
+    ViewData["Title"] = "Profile";
 }
 
-<h2>Twój Profil: @Model.UserName</h2>
+<h1>@ViewData["Title"]</h1>
 
-<h2>Edytuj Nazwę Użytkownika</h2>
-<form asp-action="EditUsername" method="post">
-    <div class="form-group">
-        <label for="newUsername">Nowa Nazwa Użytkownika:</label>
-        <input type="text" class="form-control" id="newUsername" name="newUsername" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Zapisz</button>
-</form>
+<div>
+    <h2>Change Username</h2>
+    <form asp-action="EditUsername" method="post">
+        <div class="form-group">
+            <label for="newUsername">New Username</label>
+            <input type="text" name="newUsername" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Change Username" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
 
-<h2>Edytuj Hasło</h2>
-<form asp-action="EditPassword" method="post">
-    <div class="form-group">
-        <label for="currentPassword">Obecne Hasło:</label>
-        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required />
-    </div>
-    <div class="form-group">
-        <label for="newPassword">Nowe Hasło:</label>
-        <input type="password" class="form-control" id="newPassword" name="newPassword" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Zapisz</button>
-</form>
+<div>
+    <h2>Change Password</h2>
+    <form asp-action="EditPassword" method="post">
+        <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" name="currentPassword" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" name="newPassword" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Change Password" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
 
-<form asp-action="DeleteAccount" asp-controller="Account" method="post">
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć swoje konto?');">Usuń konto</button>
-</form>
+<div>
+    <h2>Delete Account</h2>
+    <form asp-action="DeleteAccount" method="post" onsubmit="return confirmDeleteAccount()">
+        <div class="form-group">
+            <input type="submit" value="Delete Account" class="btn btn-danger" />
+        </div>
+    </form>
+</div>
+
+<div>
+    @if (ViewData.ModelState.ErrorCount > 0)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        function confirmDeleteAccount() {
+            return confirm("Are you sure you want to delete your account?");
+        }
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

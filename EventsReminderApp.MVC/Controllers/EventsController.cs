@@ -64,9 +64,10 @@ namespace EventsReminderApp.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Events()
         {
-            List<Events> events = await _context.Events.ToListAsync();
+            var events = await _context.Events.ToListAsync();
             return View(events);
         }
+
 
         [HttpGet]
         public IActionResult AddEventForm()

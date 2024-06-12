@@ -31,11 +31,19 @@ namespace EventsReminderApp.MVC.Controllers
                 return View(userLoginData);
             }
 
-            await _signInManager.PasswordSignInAsync(userLoginData.UserName, userLoginData.Password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(userLoginData.UserName, userLoginData.Password, false, false);
 
-            //przekierowanie do innego kontrolera
-            return RedirectToAction("Events", "Events");
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Events", "Events");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your username and password.");
+                return View(userLoginData);
+            }
         }
+
 
         [HttpGet]
         public IActionResult Register()
@@ -119,10 +127,23 @@ namespace EventsReminderApp.MVC.Controllers
                     await _signInManager.RefreshSignInAsync(user);
                     return RedirectToAction("Profile");
                 }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    ModelState.AddModelError(string.Empty, "Current password is incorrect.");
+                }
             }
-            // Handle errors appropriately
-            return View("Error");
+            else
+            {
+                ModelState.AddModelError(string.Empty, "User not found.");
+            }
+
+            return View("Profile", user);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Profile()
