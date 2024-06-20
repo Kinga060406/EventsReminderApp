@@ -15,6 +15,12 @@ namespace EventsReminderApp.MVC.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Konfiguracja usuwania kaskadowego dla Events
+            builder.Entity<Events>()
+                .HasOne(e => e.Author)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
