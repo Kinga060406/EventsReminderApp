@@ -60,7 +60,6 @@
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
-            <button type="button" class="btn btn-danger" onclick="closeAllToasts()">Close All Notifications</button>
         </main>
     </div>
 
@@ -104,46 +103,7 @@
                     "hideMethod": "fadeOut"
                 };
 
-                var toast = toastr.success(body, title);
-
-                // Dodaj przycisk zamykający do powiadomienia
-                $(toast).append('<button type="button" class="btn btn-secondary btn-sm mt-2" onclick="closeToast(this)">Close</button>');
-
-                // Dodaj zdarzenie do oznaczania powiadomienia jako przeczytane po zamknięciu
-                $(toast).on('hidden.bs.toast', function () {
-                    markNotificationAsRead(title); // Używaj title jako identyfikatora, dostosuj w razie potrzeby
-                });
-            }
-
-            function closeToast(button) {
-                var toast = $(button).closest('.toast');
-                toast.toast('hide');
-            }
-
-            function closeAllToasts() {
-                toastr.clear();
-            }
-
-            function markNotificationAsRead(eventId) {
-                // Użyj odpowiedniego identyfikatora dla eventId
-                var token = $('input[name="__RequestVerificationToken"]').val();
-
-                fetch('/Notifications/MarkAsRead', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': token
-                    },
-                    body: JSON.stringify(eventId)
-                }).then(response => {
-                    if (!response.ok) {
-                        console.error('Failed to mark notification as read');
-                    } else {
-                        console.log('Notification marked as read:', eventId);
-                    }
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
+                toastr.success(body, title);
             }
 
             function fetchReminders() {
