@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsReminderApp.MVC.Migrations
 {
     [DbContext(typeof(EventsReminderAppContext))]
-    [Migration("20240620132947_create database")]
+    [Migration("20240620140853_create database")]
     partial class createdatabase
     {
         /// <inheritdoc />
@@ -258,7 +258,8 @@ namespace EventsReminderApp.MVC.Migrations
                 {
                     b.HasOne("EventsReminderApp.MVC.Models.UserModel", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Author");
                 });
