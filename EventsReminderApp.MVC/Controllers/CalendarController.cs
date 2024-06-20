@@ -1,9 +1,10 @@
 ﻿using EventsReminderApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
-using EventsReminderApp;
-using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace EventsReminderApp.MVC.Controllers
 {
@@ -11,53 +12,63 @@ namespace EventsReminderApp.MVC.Controllers
     public class CalendarController : Controller
     {
         private readonly EventsReminderAppContext _context;
+        private readonly UserManager<UserModel> userManager;
 
-        public CalendarController(EventsReminderAppContext context)
+        public CalendarController(EventsReminderAppContext context, UserManager<UserModel> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
-        public ActionResult Calendar()
+        public async Task<ActionResult> Calendar()
         {
+            var user = await userManager.GetUserAsync(User);
+
             var calendar = new Calendar(DateTime.Now);
 
-            // Pobierz wydarzenia z bazy danych
-            var events = _context.Events.ToList();
+            // Pobierz wydarzenia z bazy danych dla aktualnie zalogowanego użytkownika
+            var events = _context.Events.Where(e => e.Author == user).ToList();
 
             ViewBag.Events = events;
 
             return View(calendar);
         }
 
-        public ActionResult PreviousMonth(int year, int month)
+        public async Task<ActionResult> PreviousMonth(int year, int month)
         {
+            var user = await userManager.GetUserAsync(User);
+
             DateTime currentDate = new DateTime(year, month, 1).AddMonths(-1);
             var calendar = new Calendar(currentDate);
 
-            // Pobierz wydarzenia z bazy danych
-            var events = _context.Events.ToList();
+            // Pobierz wydarzenia z bazy danych dla aktualnie zalogowanego użytkownika
+            var events = _context.Events.Where(e => e.Author == user).ToList();
 
             ViewBag.Events = events;
 
             return View("Calendar", calendar);
         }
 
-        public ActionResult NextMonth(int year, int month)
+        public async Task<ActionResult> NextMonth(int year, int month)
         {
+            var user = await userManager.GetUserAsync(User);
+
             DateTime currentDate = new DateTime(year, month, 1).AddMonths(1);
             var calendar = new Calendar(currentDate);
 
-            // Pobierz wydarzenia z bazy danych
-            var events = _context.Events.ToList();
+            // Pobierz wydarzenia z bazy danych dla aktualnie zalogowanego użytkownika
+            var events = _context.Events.Where(e => e.Author == user).ToList();
 
             ViewBag.Events = events;
 
             return View("Calendar", calendar);
         }
 
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            var eventToEdit = _context.Events.Find(id);
+            var user = await userManager.GetUserAsync(User);
+
+            var eventToEdit = _context.Events.FirstOrDefault(e => e.Id == id && e.Author == user);
             if (eventToEdit == null)
             {
                 return NotFound();
@@ -68,8 +79,15 @@ namespace EventsReminderApp.MVC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Events eventToEdit)
+        public async Task<ActionResult> Edit(Events eventToEdit)
         {
+            var user = await userManager.GetUserAsync(User);
+
+            if (eventToEdit.Author != user)
+            {
+                return Forbid();
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Update(eventToEdit);
@@ -80,9 +98,11 @@ namespace EventsReminderApp.MVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var eventToDelete = _context.Events.Find(id);
+            var user = await userManager.GetUserAsync(User);
+
+            var eventToDelete = _context.Events.FirstOrDefault(e => e.Id == id && e.Author == user);
             if (eventToDelete != null)
             {
                 _context.Events.Remove(eventToDelete);
@@ -90,6 +110,6 @@ namespace EventsReminderApp.MVC.Controllers
             }
             return RedirectToAction("Calendar");
         }
-
     }
 }
+
