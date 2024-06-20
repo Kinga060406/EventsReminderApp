@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace EventsReminderApp.MVC.Controllers
 {
@@ -14,10 +15,12 @@ namespace EventsReminderApp.MVC.Controllers
     public class EventsController : Controller
     {
         private readonly EventsReminderAppContext _context;
+        private readonly UserManager<UserModel> userManager;
 
-        public EventsController(EventsReminderAppContext context)
+        public EventsController(EventsReminderAppContext context, UserManager<UserModel> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
         public IActionResult AddEvent()
@@ -39,6 +42,7 @@ namespace EventsReminderApp.MVC.Controllers
                 {
                     try
                     {
+                        events.Author = await userManager.GetUserAsync(User);
                         _context.Events.Add(events);
                         await _context.SaveChangesAsync();
                         return RedirectToAction("Events", "Events");
@@ -64,6 +68,9 @@ namespace EventsReminderApp.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Events()
         {
+            var user = await userManager.GetUserAsync(User);
+            ViewBag.UserEvents = _context.Events.Where(e => e.Author == user);
+
             var events = await _context.Events.ToListAsync();
             return View(events);
         }

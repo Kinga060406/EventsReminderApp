@@ -8,6 +8,6 @@
         public DateOnly Date { get; set; }
         public TimeOnly Time { get; set; }
 
-
+        public UserModel? Author { get; set; }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsReminderApp.MVC.Migrations
 {
     [DbContext(typeof(EventsReminderAppContext))]
-    [Migration("20240609163526_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240620140853_create database")]
+    partial class createdatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace EventsReminderApp.MVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -47,6 +50,8 @@ namespace EventsReminderApp.MVC.Migrations
                         .HasColumnType("time");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
 
                     b.ToTable("Events");
                 });
@@ -247,6 +252,16 @@ namespace EventsReminderApp.MVC.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("EventsReminderApp.MVC.Models.Events", b =>
+                {
+                    b.HasOne("EventsReminderApp.MVC.Models.UserModel", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Author");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

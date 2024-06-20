@@ -30,6 +30,9 @@ namespace EventsReminderApp.MVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -45,7 +48,9 @@ namespace EventsReminderApp.MVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events", (string)null);
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("EventsReminderApp.MVC.Models.UserModel", b =>
@@ -244,6 +249,16 @@ namespace EventsReminderApp.MVC.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("EventsReminderApp.MVC.Models.Events", b =>
+                {
+                    b.HasOne("EventsReminderApp.MVC.Models.UserModel", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Author");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

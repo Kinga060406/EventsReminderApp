@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace EventsReminderApp.MVC.Models
 {
-    public class UserModel : IdentityUser 
+    public class UserModel : IdentityUser
     {
-        
+
     }
 }
